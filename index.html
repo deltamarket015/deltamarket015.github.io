@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delta Mail - Shared Temporary Email</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+
+    <style>
+        body { font-family: 'Space Grotesk', sans-serif; background-color: #0b0f19; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .material-symbols-outlined { font-size: inherit; vertical-align: middle; }
+
+        @keyframes fill-bar { from { width: 0%; } to { width: 100%; } }
+        .animate-fill-bar { animation: fill-bar 2s ease-out forwards; }
+        
+        @keyframes toastIn { from { transform: translateY(100%) scale(0.9); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+        @keyframes toastOut { from { transform: translateY(0) scale(1); opacity: 1; } to { transform: translateY(100%) scale(0.9); opacity: 0; } }
+        .toast-in { animation: toastIn 0.3s ease-out forwards; }
+        .toast-out { animation: toastOut 0.3s ease-in forwards; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner {
+            display: inline-block; width: 1.25rem; height: 1.25rem;
+            border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%;
+            border-top-color: white; animation: spin 1s ease-in-out infinite;
+        }
+
+        /* Custom Input Styling */
+        .custom-input {
+            background-color: #121520;
+            border: 1px solid #2d3348;
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+        .custom-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+        .custom-input-orange:focus {
+            border-color: #f97316;
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
+        }
+        
+        /* Smooth Collapse Animation */
+        .collapse-content {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.3s ease-in-out;
+        }
+        .collapse-content.expanded {
+            grid-template-rows: 1fr;
+        }
+        .collapse-inner {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="text-gray-200 antialiased transition-colors duration-300">
+
+    <div id="splash-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0b0f19] transition-opacity duration-500">
+        <div class="text-center">
+            <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 text-transparent bg-clip-text">Delta Mail</h1>
+            <p class="text-gray-400 mt-2">No Login, No Signup, Just Privacy.</p>
+        </div>
+        <div class="w-48 h-1.5 bg-gray-800 rounded-full overflow-hidden mt-8">
+            <div id="loading-bar" class="h-full bg-gradient-to-r from-blue-500 to-purple-600 animate-fill-bar"></div>
+        </div>
+    </div>
+
+    <div id="app-container" class="max-w-md mx-auto h-screen flex flex-col opacity-0 transition-opacity duration-500 relative">
+        
+        <div id="home-screen" class="flex flex-col h-full">
+            <header class="flex items-center justify-between p-4 border-b border-gray-800 sticky top-0 bg-[#0b0f19]/90 backdrop-blur-md z-10">
+                <button id="premium-btn" class="flex items-center gap-1 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-md hover:scale-105 transition-transform">
+                    <span class="material-symbols-outlined text-sm">workspace_premium</span> PRO
+                </button>
+                <h1 class="text-xl font-bold text-center absolute left-1/2 -translate-x-1/2">Delta Mail</h1>
+                <button id="account-btn" class="p-2 rounded-full hover:bg-gray-800 transition-colors text-gray-300">
+                    <span id="account-icon" class="material-symbols-outlined">account_circle</span>
+                </button>
+            </header>
+
+            <main class="p-4 space-y-5 flex-grow overflow-y-auto no-scrollbar">
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <button id="change-mail-btn" class="flex items-center justify-center gap-2 w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md transition-all duration-300">
+                        <span class="material-symbols-outlined">change_circle</span>
+                        <span>New Mail</span>
+                    </button>
+                    <button id="delete-mail-btn" class="flex items-center justify-center gap-2 w-full bg-red-600 hover:bg-red-500 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md transition-all duration-300">
+                        <span class="material-symbols-outlined">delete_forever</span>
+                        <span>Destroy</span>
+                    </button>
+                </div>
+
+                <div class="bg-[#0b0a10] p-5 rounded-[14px] shadow-[0_0_20px_rgba(168,85,247,0.12)] border border-purple-500/30 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-purple-900/10 to-transparent pointer-events-none"></div>
+                    
+                    <div class="flex items-center gap-2 mb-5 relative z-10">
+                        <span class="material-symbols-outlined text-[#06b6d4] text-[18px]">diamond</span>
+                        <p class="text-[14px] font-bold text-[#06b6d4] tracking-wide uppercase">Free Plan Inbox</p>
+                    </div>
+                    
+                    <div class="space-y-4 relative z-10">
+                        <div>
+                            <p class="text-xs text-gray-400 mb-1.5">Email Address</p>
+                            <div class="flex items-center justify-between group">
+                                <span id="email-address" class="font-mono text-lg font-bold text-white truncate mr-2">loading...</span>
+                                <button id="copy-email-btn" class="flex-shrink-0 p-2 rounded-lg bg-white/5 hover:bg-purple-500/20 text-gray-400 hover:text-purple-400 transition-colors border border-white/5 hover:border-purple-500/30 active:scale-95">
+                                    <span class="material-symbols-outlined text-[18px]">content_copy</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <p class="text-xs text-gray-400 mb-1.5">Password (Keep secret or share)</p>
+                            <div class="flex items-center justify-between group">
+                                <span id="email-password" class="font-mono text-md font-bold text-purple-300 truncate mr-2">loading...</span>
+                                <button id="copy-pass-btn" class="flex-shrink-0 p-2 rounded-lg bg-white/5 hover:bg-purple-500/20 text-gray-400 hover:text-purple-400 transition-colors border border-white/5 hover:border-purple-500/30 active:scale-95">
+                                    <span class="material-symbols-outlined text-[18px]">content_copy</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-[#161925] rounded-[14px] border border-gray-800 overflow-hidden shadow-sm">
+                    <button id="toggle-shared-btn" class="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors focus:outline-none">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-[#0d6efd] w-[34px] h-[34px] rounded-[8px] flex items-center justify-center shadow-inner">
+                                <span class="material-symbols-outlined text-white text-[18px]">group</span>
+                            </div>
+                            <p class="text-[15px] font-bold text-white tracking-wide">Access Shared Email</p>
+                        </div>
+                        <span id="shared-chevron" class="material-symbols-outlined text-gray-500 text-[20px] transition-transform duration-300">expand_more</span>
+                    </button>
+                    
+                    <div id="shared-content-container" class="collapse-content">
+                        <div class="collapse-inner">
+                            <div class="px-4 pb-4 pt-3 border-t border-gray-800/60 mx-1 mt-1">
+                                <div class="space-y-3">
+                                    <input id="login-address" type="email" placeholder="Email Address" class="w-full p-3 text-sm rounded-lg custom-input">
+                                    <input id="login-password" type="text" placeholder="Password" class="w-full p-3 text-sm rounded-lg custom-input">
+                                    <button id="login-btn" class="w-full bg-[#2a3042] hover:bg-[#3b435b] text-white font-semibold py-3 rounded-lg shadow-md transition-all duration-300 mt-1">
+                                        Login to Inbox
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <div class="flex items-center justify-between mb-3 border-b border-gray-800 pb-2">
+                        <h2 class="text-lg font-bold flex items-center gap-2 text-white">
+                            <span class="material-symbols-outlined">inbox</span> Inbox
+                        </h2>
+                        <button id="refresh-btn" class="p-2 rounded-full hover:bg-gray-800 transition-colors text-gray-300">
+                            <span class="material-symbols-outlined">refresh</span>
+                        </button>
+                    </div>
+                    <div id="empty-inbox" class="text-center py-10 px-4 bg-[#161925] rounded-xl border border-gray-800">
+                        <span class="material-symbols-outlined text-5xl text-gray-600">mark_email_unread</span>
+                        <p class="mt-2 text-sm text-gray-500">Your inbox is empty<br>Waiting for incoming emails...</p>
+                    </div>
+                    <div id="inbox-list" class="space-y-3" style="display: none;"></div>
+                </div>
+            </main>
+            
+            <footer class="p-4 text-center text-xs text-gray-500 border-t border-gray-800 bg-[#0b0f19]">
+                &copy; 2026 Delta Mail. Powered by <a href="https://t.me/Delta_Market_Store" class="text-blue-500 hover:text-blue-400 font-semibold">Delta Market</a>.
+            </footer>
+        </div>
+
+        <div id="account-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 px-4">
+            <div id="account-content" class="bg-[#1a1d27] w-full max-w-sm rounded-2xl border border-gray-700 p-6 relative overflow-hidden transform scale-95 transition-transform duration-300 shadow-2xl">
+                <button id="close-account-btn" class="absolute top-4 right-4 p-1.5 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors text-gray-400 z-20">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                </button>
+
+                <div class="absolute -top-4 -right-4 p-2 opacity-[0.08] pointer-events-none z-0">
+                    <span class="material-symbols-outlined text-9xl text-amber-500">stars</span>
+                </div>
+                
+                <p class="text-[16px] font-bold mb-1 flex items-center gap-1.5 text-orange-400 relative z-10">
+                    <span class="material-symbols-outlined text-[18px]">admin_panel_settings</span> 
+                    Private Premium Login
+                </p>
+                <p class="text-sm text-gray-400 mb-5 relative z-10">Login to your dedicated custom workspace.</p>
+                
+                <div class="space-y-3 relative z-10">
+                    <input id="premium-username" type="text" placeholder="Username" class="w-full p-3.5 text-sm rounded-xl custom-input custom-input-orange">
+                    <input id="premium-password" type="password" placeholder="Password" class="w-full p-3.5 text-sm rounded-xl custom-input custom-input-orange">
+                    <button id="premium-login-btn" class="w-full bg-[#f97316] hover:bg-[#ea580c] text-white font-bold py-3.5 rounded-xl shadow-md transition-all duration-300 active:scale-95 mt-2">
+                        Login to Premium
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="premium-modal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+            <div id="premium-content" class="bg-[#121520] w-full max-w-md rounded-t-2xl sm:rounded-2xl shadow-2xl border border-gray-800 transform translate-y-full sm:translate-y-10 transition-transform duration-300 flex flex-col max-h-[90vh]">
+                <div class="p-6 overflow-y-auto no-scrollbar relative">
+                    <button id="close-premium-btn" class="absolute top-4 right-4 p-2 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors text-gray-400">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                    
+                    <div class="text-center mb-4 pt-2">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-white mb-3 shadow-lg">
+                            <span class="material-symbols-outlined text-4xl">workspace_premium</span>
+                        </div>
+                        <h2 class="text-2xl font-bold text-orange-400">Delta Mail Premium</h2>
+                        <p class="text-sm text-gray-400 mt-1">Unlock the ultimate privacy tools.</p>
+                        
+                        <div class="mt-4 mb-2">
+                            <span class="inline-block bg-orange-900/30 border border-orange-500/50 text-orange-400 font-black py-1.5 px-6 rounded-full text-xl shadow-sm">
+                                $5 / year
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 mb-8 text-gray-200">
+                        <div class="flex items-start gap-3"><span class="material-symbols-outlined text-green-500 mt-0.5">check_circle</span><p class="text-sm font-medium">Unlimited Mail Generation</p></div>
+                        <div class="flex items-start gap-3"><span class="material-symbols-outlined text-green-500 mt-0.5">check_circle</span><p class="text-sm font-medium">Get exclusive @real-email.com addresses</p></div>
+                        <div class="flex items-start gap-3"><span class="material-symbols-outlined text-green-500 mt-0.5">check_circle</span><p class="text-sm font-medium">Create your own custom mail prefixes</p></div>
+                        <div class="flex items-start gap-3"><span class="material-symbols-outlined text-green-500 mt-0.5">check_circle</span><p class="text-sm font-medium">100% Private Address with full ownership</p></div>
+                        <div class="flex items-start gap-3"><span class="material-symbols-outlined text-green-500 mt-0.5">check_circle</span><p class="text-sm font-medium">Connect your own custom domain</p></div>
+                        <div class="flex items-start gap-3"><span class="material-symbols-outlined text-green-500 mt-0.5">check_circle</span><p class="text-sm font-medium">Access to dedicated premium domains</p></div>
+                        <div class="flex items-start gap-3"><span class="material-symbols-outlined text-green-500 mt-0.5">check_circle</span><p class="text-sm font-medium">Send & receive unlimited mail (No spam/blocks)</p></div>
+                    </div>
+
+                    <a href="payment.html" class="block w-full text-center bg-[#8b5cf6] hover:bg-[#7c3aed] text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition-transform transform hover:scale-105">
+                        Buy Premium Now
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="email-screen" class="hidden flex-col h-full absolute inset-0 bg-[#0b0f19] z-20">
+            <header class="flex items-center p-4 border-b border-gray-800 sticky top-0 bg-[#0b0f19]/90 backdrop-blur-md z-10">
+                <button id="back-to-inbox-btn" class="p-2 rounded-full hover:bg-gray-800 transition-colors text-white">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                </button>
+                <h2 class="text-lg font-bold text-center flex-grow truncate px-4 text-white" id="email-subject-header">Email Details</h2>
+            </header>
+            <main class="p-4 flex-grow overflow-y-auto no-scrollbar space-y-4">
+                <div class="flex items-start gap-3">
+                    <div id="email-avatar" class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white flex items-center justify-center text-xl font-bold flex-shrink-0 shadow-md"></div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-baseline">
+                           <p id="email-from" class="font-semibold truncate text-white"></p>
+                           <p id="email-timestamp" class="text-xs text-gray-400 flex-shrink-0 ml-2"></p>
+                        </div>
+                        <p class="text-sm text-gray-400">to: <span id="email-to"></span></p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg mt-2 h-[60vh] border border-gray-800">
+                     <iframe id="email-body" class="w-full h-full border-0 rounded-xl" sandbox="allow-same-origin"></iframe>
+                </div>
+                <button id="delete-message-btn" class="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-500 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md transition-all">
+                    <span class="material-symbols-outlined">visibility_off</span>
+                    <span>Hide Message</span>
+                </button>
+            </main>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[100] space-y-2 w-max max-w-[90%] pointer-events-none"></div>
+    
+    <script type="module">
+        const API_BASE = 'https://api.mail.tm';
+        let currentAccount = { id: null, address: null, password: null, token: null };
+        let inboxInterval = null;
+        let cachedMessages = [];
+
+        const DOMElements = {
+            splashScreen: document.getElementById('splash-screen'),
+            appContainer: document.getElementById('app-container'),
+            homeScreen: document.getElementById('home-screen'),
+            emailScreen: document.getElementById('email-screen'),
+            emailAddress: document.getElementById('email-address'),
+            emailPassword: document.getElementById('email-password'),
+            
+            // New Separate Copy Buttons
+            copyEmailBtn: document.getElementById('copy-email-btn'),
+            copyPassBtn: document.getElementById('copy-pass-btn'),
+            
+            loginAddress: document.getElementById('login-address'),
+            loginPassword: document.getElementById('login-password'),
+            loginBtn: document.getElementById('login-btn'),
+            premiumLoginBtn: document.getElementById('premium-login-btn'),
+            accountBtn: document.getElementById('account-btn'),
+            inboxList: document.getElementById('inbox-list'),
+            emptyInbox: document.getElementById('empty-inbox'),
+            refreshBtn: document.getElementById('refresh-btn'),
+            changeMailBtn: document.getElementById('change-mail-btn'),
+            deleteMailBtn: document.getElementById('delete-mail-btn'),
+            backToInboxBtn: document.getElementById('back-to-inbox-btn'),
+            emailSubjectHeader: document.getElementById('email-subject-header'),
+            emailAvatar: document.getElementById('email-avatar'),
+            emailFrom: document.getElementById('email-from'),
+            emailTo: document.getElementById('email-to'),
+            emailTimestamp: document.getElementById('email-timestamp'),
+            emailBody: document.getElementById('email-body'),
+            deleteMessageBtn: document.getElementById('delete-message-btn'),
+            premiumBtn: document.getElementById('premium-btn'),
+            premiumModal: document.getElementById('premium-modal'),
+            premiumContent: document.getElementById('premium-content'),
+            closePremiumBtn: document.getElementById('close-premium-btn'),
+            accountModal: document.getElementById('account-modal'),
+            accountContent: document.getElementById('account-content'),
+            closeAccountBtn: document.getElementById('close-account-btn'),
+            // Expandable Accordion Elements
+            toggleSharedBtn: document.getElementById('toggle-shared-btn'),
+            sharedContentContainer: document.getElementById('shared-content-container'),
+            sharedChevron: document.getElementById('shared-chevron')
+        };
+
+        const safeString = (str) => (str || '').toString();
+        const escapeHTML = (str) => {
+            const p = document.createElement('p'); p.textContent = safeString(str); return p.innerHTML;
+        };
+
+        const fetchWithTimeout = async (url, options = {}, timeout = 8000) => {
+            const controller = new AbortController(); const id = setTimeout(() => controller.abort(), timeout);
+            try { const response = await fetch(url, { ...options, signal: controller.signal }); clearTimeout(id); return response; } 
+            catch (error) { clearTimeout(id); throw error; }
+        };
+
+        const showToast = (message, type = 'info') => {
+            const toast = document.createElement('div');
+            const colors = { info: 'bg-[#1e2330] border border-gray-700 text-white', success: 'bg-green-600 text-white', warning: 'bg-orange-500 text-white', error: 'bg-red-600 text-white' };
+            toast.className = `px-4 py-3 rounded-lg shadow-xl text-sm font-medium toast-in ${colors[type]} flex items-center gap-2`;
+            toast.innerHTML = `<span class="material-symbols-outlined text-lg">${type === 'success' ? 'check_circle' : type === 'error' ? 'error' : type === 'warning' ? 'warning' : 'info'}</span> ${message}`;
+            document.getElementById('toast-container').appendChild(toast);
+            setTimeout(() => { toast.classList.remove('toast-in'); toast.classList.add('toast-out'); toast.addEventListener('animationend', () => toast.remove()); }, 3000);
+        };
+
+        const showSpinner = (button, show) => {
+            const originalContent = button.dataset.originalContent || button.innerHTML;
+            if (show) {
+                if (!button.querySelector('.spinner')) {
+                    button.dataset.originalContent = button.innerHTML;
+                    button.innerHTML = '<span class="spinner"></span>';
+                    button.disabled = true; button.classList.add('opacity-80', 'cursor-not-allowed');
+                }
+            } else {
+                if (button.dataset.originalContent) button.innerHTML = button.dataset.originalContent;
+                button.disabled = false; button.classList.remove('opacity-80', 'cursor-not-allowed');
+            }
+        };
+
+        const updateUIWithCurrentAccount = () => {
+            DOMElements.emailAddress.textContent = currentAccount.address;
+            DOMElements.emailPassword.textContent = currentAccount.password;
+        };
+
+        const getNewEmail = async (isDelete = false) => {
+            showSpinner(DOMElements.changeMailBtn, true); showSpinner(DOMElements.deleteMailBtn, true);
+            if (isDelete && currentAccount.id) {
+                try { await fetchWithTimeout(`${API_BASE}/accounts/${currentAccount.id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${currentAccount.token}` } }); showToast("Account destroyed.", "info"); } catch (e) {}
+                localStorage.removeItem('deltaMailSavedAccount');
+            }
+            clearInterval(inboxInterval); cachedMessages = []; DOMElements.inboxList.innerHTML = ''; DOMElements.emptyInbox.style.display = 'block'; DOMElements.inboxList.style.display = 'none';
+            try {
+                const domainResponse = await fetchWithTimeout(`${API_BASE}/domains`); const domains = await domainResponse.json(); const domain = domains['hydra:member'][0].domain;
+                const address = `deltamail${Math.floor(10000 + Math.random() * 90000)}@${domain}`; const password = `DeltaMarket${Math.floor(10000 + Math.random() * 90000)}`;
+                const accountResponse = await fetchWithTimeout(`${API_BASE}/accounts`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ address, password }) }); const accountData = await accountResponse.json();
+                const tokenResponse = await fetchWithTimeout(`${API_BASE}/token`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ address, password }) }); const tokenData = await tokenResponse.json();
+                currentAccount = { id: accountData.id, address, password, token: tokenData.token };
+                localStorage.setItem('deltaMailSavedAccount', JSON.stringify({ address, password }));
+                updateUIWithCurrentAccount(); if (!isDelete) showToast("New email generated!", "success");
+                checkInbox(); inboxInterval = setInterval(checkInbox, 10000);
+            } catch (error) { showToast("Error creating email.", "error"); } finally { showSpinner(DOMElements.changeMailBtn, false); showSpinner(DOMElements.deleteMailBtn, false); }
+        };
+
+        const loginToSharedEmail = async () => {
+            const address = DOMElements.loginAddress.value.trim();
+            const password = DOMElements.loginPassword.value.trim();
+            if (!address || !password) { showToast("Please enter both email and password.", "warning"); return false; }
+            showSpinner(DOMElements.loginBtn, true);
+
+            try {
+                const tokenResponse = await fetchWithTimeout(`${API_BASE}/token`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ address, password }) });
+                if (!tokenResponse.ok) throw new Error('Invalid credentials');
+                const tokenData = await tokenResponse.json();
+                currentAccount = { id: tokenData.id, address, password, token: tokenData.token };
+                localStorage.setItem('deltaMailSavedAccount', JSON.stringify({ address, password }));
+                updateUIWithCurrentAccount(); DOMElements.loginAddress.value = ''; DOMElements.loginPassword.value = ''; cachedMessages = [];
+                showToast("Successfully logged into inbox!", "success");
+                clearInterval(inboxInterval); await checkInbox(); inboxInterval = setInterval(checkInbox, 10000); 
+                return true;
+            } catch (error) { showToast("Login failed. Check credentials.", "error"); return false; } 
+            finally { showSpinner(DOMElements.loginBtn, false); }
+        };
+
+        const silentLogin = async (autoAddress, autoPassword) => {
+            try {
+                const tokenResponse = await fetchWithTimeout(`${API_BASE}/token`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ address: autoAddress, password: autoPassword }) });
+                if (!tokenResponse.ok) throw new Error('Invalid');
+                const tokenData = await tokenResponse.json();
+                currentAccount = { id: tokenData.id, address: autoAddress, password: autoPassword, token: tokenData.token };
+                updateUIWithCurrentAccount(); clearInterval(inboxInterval); await checkInbox(); inboxInterval = setInterval(checkInbox, 10000); return true;
+            } catch (error) { return false; } 
+        };
+
+        const checkInbox = async () => {
+            if (!currentAccount.token) return;
+            DOMElements.refreshBtn.classList.add('animate-spin');
+            try {
+                const response = await fetchWithTimeout(`${API_BASE}/messages`, { headers: { 'Authorization': `Bearer ${currentAccount.token}` } });
+                if (response.status === 401) { showToast("Session expired. Getting new email...", "warning"); localStorage.removeItem('deltaMailSavedAccount'); await getNewEmail(); return; }
+                if (!response.ok) throw new Error(`Failed to fetch inbox`);
+                const messages = await response.json(); cachedMessages = messages['hydra:member'] || []; renderInbox(cachedMessages);
+            } catch (error) {} finally { DOMElements.refreshBtn.classList.remove('animate-spin'); }
+        };
+
+        const openEmail = async (id) => {
+            DOMElements.homeScreen.classList.add('hidden'); DOMElements.emailScreen.classList.remove('hidden'); DOMElements.emailScreen.classList.add('flex'); DOMElements.emailSubjectHeader.dataset.messageId = id;
+            try {
+                const response = await fetchWithTimeout(`${API_BASE}/messages/${id}`, { headers: { 'Authorization': `Bearer ${currentAccount.token}` } });
+                if (!response.ok) throw new Error('Failed to fetch message');
+                const emailData = await response.json();
+                DOMElements.emailSubjectHeader.textContent = safeString(emailData.subject) || 'No Subject'; DOMElements.emailFrom.textContent = safeString(emailData.from?.name || emailData.from?.address || 'Unknown');
+                DOMElements.emailTo.textContent = currentAccount.address; DOMElements.emailTimestamp.textContent = formatDate(new Date(safeString(emailData.createdAt)));
+                DOMElements.emailAvatar.textContent = safeString(emailData.from?.name || emailData.from?.address || 'U')[0].toUpperCase();
+                let htmlContent = '';
+                if (Array.isArray(emailData.html) && emailData.html.length > 0) htmlContent = emailData.html[0];
+                else if (emailData.text) htmlContent = `<p style="font-family: sans-serif; padding: 10px;">${escapeHTML(emailData.text).replace(/\n/g, '<br>')}</p>`;
+                else htmlContent = '<p style="font-family: sans-serif; padding: 10px;">No content available.</p>';
+                DOMElements.emailBody.srcdoc = htmlContent;
+            } catch(error) { showToast('Could not load email content.', 'error'); showHomeScreen(); }
+        };
+
+        const renderInbox = (messages) => {
+            DOMElements.inboxList.innerHTML = '';
+            if (messages.length === 0) { DOMElements.emptyInbox.style.display = 'block'; DOMElements.inboxList.style.display = 'none'; } else {
+                DOMElements.emptyInbox.style.display = 'none'; DOMElements.inboxList.style.display = 'block';
+                const sortedMessages = messages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                sortedMessages.forEach(msg => {
+                    const emailItem = document.createElement('div');
+                    emailItem.className = 'bg-[#161925] border border-gray-800 p-3 rounded-xl shadow-sm cursor-pointer hover:border-gray-600 transition-all duration-200';
+                    emailItem.dataset.id = msg.id;
+                    const isNew = (Date.now() - new Date(msg.createdAt)) < 30000;
+                    emailItem.innerHTML = `
+                        <div class="flex items-center justify-between mb-1"><p class="font-bold truncate pr-2 text-sm text-gray-200">${escapeHTML(safeString(msg.from?.name || msg.from?.address))}</p><p class="text-xs text-gray-500 flex-shrink-0">${formatDate(new Date(msg.createdAt))}</p></div>
+                        <p class="font-medium text-sm truncate text-gray-400">${escapeHTML(safeString(msg.subject))}</p>
+                        <p class="text-xs text-gray-600 truncate mt-1">${escapeHTML(safeString(msg.intro))}</p>
+                        ${isNew ? '<span class="inline-block mt-2 px-2 py-0.5 bg-blue-900/50 border border-blue-700 text-blue-400 text-[10px] font-bold rounded new-email-badge">NEW MESSAGE</span>' : ''}
+                    `;
+                    DOMElements.inboxList.appendChild(emailItem);
+                });
+            }
+        };
+
+        const showHomeScreen = () => { DOMElements.emailScreen.classList.add('hidden'); DOMElements.emailScreen.classList.remove('flex'); DOMElements.homeScreen.classList.remove('hidden'); };
+
+        const deleteMessageLocally = (messageId) => { cachedMessages = cachedMessages.filter(msg => msg.id !== messageId); renderInbox(cachedMessages); showToast("Message hidden locally.", "info"); showHomeScreen(); };
+
+        const formatDate = (date) => {
+            const seconds = Math.floor((new Date() - date) / 1000); if (seconds < 60) return "Just now";
+            const intervals = [ { limit: 31536000, label: 'y' }, { limit: 2592000, label: 'mo' }, { limit: 86400, label: 'd' }, { limit: 3600, label: 'h' }, { limit: 60, label: 'm' } ];
+            for (let i = 0; i < intervals.length; i++) { const interval = Math.floor(seconds / intervals[i].limit); if (interval >= 1) return `${interval}${intervals[i].label} ago`; }
+        };
+
+        // Expandable Accordion Logic
+        DOMElements.toggleSharedBtn.addEventListener('click', () => {
+            const isExpanded = DOMElements.sharedContentContainer.classList.contains('expanded');
+            if (isExpanded) {
+                DOMElements.sharedContentContainer.classList.remove('expanded');
+                DOMElements.sharedChevron.style.transform = 'rotate(0deg)';
+            } else {
+                DOMElements.sharedContentContainer.classList.add('expanded');
+                DOMElements.sharedChevron.style.transform = 'rotate(180deg)';
+            }
+        });
+
+        // Modals Functions
+        const openPremiumModal = () => { DOMElements.premiumModal.classList.remove('opacity-0', 'pointer-events-none'); DOMElements.premiumContent.classList.remove('translate-y-full', 'sm:translate-y-10'); DOMElements.premiumContent.classList.add('translate-y-0'); };
+        const closePremiumModal = () => { DOMElements.premiumModal.classList.add('opacity-0', 'pointer-events-none'); DOMElements.premiumContent.classList.remove('translate-y-0'); DOMElements.premiumContent.classList.add('translate-y-full', 'sm:translate-y-10'); };
+        
+        const openAccountModal = () => { DOMElements.accountModal.classList.remove('opacity-0', 'pointer-events-none'); DOMElements.accountContent.classList.remove('scale-95'); DOMElements.accountContent.classList.add('scale-100'); };
+        const closeAccountModal = () => { DOMElements.accountModal.classList.add('opacity-0', 'pointer-events-none'); DOMElements.accountContent.classList.remove('scale-100'); DOMElements.accountContent.classList.add('scale-95'); };
+
+        const initApp = async () => {
+            setTimeout(() => { DOMElements.splashScreen.style.opacity = '0'; DOMElements.appContainer.style.opacity = '1'; setTimeout(() => DOMElements.splashScreen.style.display = 'none', 500); }, 2200);
+
+            const savedAccountStr = localStorage.getItem('deltaMailSavedAccount');
+            if (savedAccountStr) {
+                try {
+                    const savedAccount = JSON.parse(savedAccountStr);
+                    const loginSuccess = await silentLogin(savedAccount.address, savedAccount.password);
+                    if (!loginSuccess) await getNewEmail();
+                } catch (e) { await getNewEmail(); }
+            } else { await getNewEmail(); }
+
+            // Individual Copy Button Listeners
+            DOMElements.copyEmailBtn.addEventListener('click', () => {
+                if (!currentAccount.address) return;
+                navigator.clipboard.writeText(currentAccount.address).then(() => {
+                    showToast("Email address copied!", "success");
+                }).catch(() => showToast("Failed to copy email", "error"));
+            });
+
+            DOMElements.copyPassBtn.addEventListener('click', () => {
+                if (!currentAccount.password) return;
+                navigator.clipboard.writeText(currentAccount.password).then(() => {
+                    showToast("Password copied!", "success");
+                }).catch(() => showToast("Failed to copy password", "error"));
+            });
+
+            DOMElements.changeMailBtn.addEventListener('click', () => getNewEmail(false));
+            DOMElements.deleteMailBtn.addEventListener('click', () => getNewEmail(true));
+            DOMElements.refreshBtn.addEventListener('click', checkInbox);
+            DOMElements.backToInboxBtn.addEventListener('click', showHomeScreen);
+            DOMElements.loginBtn.addEventListener('click', loginToSharedEmail);
+            
+            // Account Logic
+            DOMElements.accountBtn.addEventListener('click', openAccountModal);
+            DOMElements.closeAccountBtn.addEventListener('click', closeAccountModal);
+            DOMElements.accountModal.addEventListener('click', (e) => { if(e.target === DOMElements.accountModal) closeAccountModal(); });
+
+            // Premium Logic
+            DOMElements.premiumLoginBtn.addEventListener('click', () => {
+                showToast("You have to buy Premium to create a private account.", "warning");
+                setTimeout(() => { window.location.href = 'payment.html'; }, 1500);
+            });
+            DOMElements.premiumBtn.addEventListener('click', openPremiumModal);
+            DOMElements.closePremiumBtn.addEventListener('click', closePremiumModal);
+            DOMElements.premiumModal.addEventListener('click', (e) => { if(e.target === DOMElements.premiumModal) closePremiumModal(); });
+            
+            DOMElements.inboxList.addEventListener('click', (e) => { const emailItem = e.target.closest('[data-id]'); if (emailItem) openEmail(emailItem.dataset.id); });
+            DOMElements.deleteMessageBtn.addEventListener('click', () => { const messageId = DOMElements.emailSubjectHeader.dataset.messageId; if (messageId) deleteMessageLocally(messageId); });
+        };
+
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
