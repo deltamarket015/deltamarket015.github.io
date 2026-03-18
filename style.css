@@ -1,0 +1,206 @@
+/* --- Core Variables --- */
+:root {
+    --bg-black: #050505;
+    --card-bg: rgba(20, 20, 20, 0.4);
+    --pink-main: #ff107a;
+    --pink-glow: #ff007f;
+    --text-main: #ffffff;
+    --text-muted: #a0a0a0;
+    --glass-border: rgba(255, 16, 122, 0.15);
+    
+    --success-color: #00e676;
+    --warning-color: #ff9100;
+
+    --transition: all 0.4s ease;
+    --flip-transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); 
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; }
+
+body { 
+    background-color: var(--bg-black); 
+    color: var(--text-main); 
+    min-height: 100vh; 
+    overflow-x: hidden; 
+    display: flex; 
+    flex-direction: column; 
+}
+
+/* --- Particle Canvas & Soft Ambient Backgrounds --- */
+#particle-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none; }
+
+.ambient-glow {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(200px); 
+    z-index: -1;
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+.glow-pink-top {
+    top: -20vw; left: -10vw;
+    width: 60vw; height: 60vw;
+    background: radial-gradient(circle, var(--pink-glow) 0%, transparent 70%);
+}
+
+.glow-purple-bottom {
+    bottom: -20vw; right: -10vw;
+    width: 50vw; height: 50vw;
+    background: radial-gradient(circle, #4a00e0 0%, transparent 70%);
+}
+
+/* --- Layout System --- */
+.container { width: 100%; max-width: 1440px; margin: 0 auto; padding: 0 2rem; flex: 1; }
+
+.glass { 
+    backdrop-filter: blur(24px); 
+    -webkit-backdrop-filter: blur(24px); 
+}
+
+/* --- Floating Pill Navigation --- */
+.nav-pill {
+    max-width: 1000px; 
+    width: 90%;
+    margin: 2rem auto 6rem auto;
+    padding: 1rem 2rem;
+    border-radius: 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(15, 15, 15, 0.6);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255, 16, 122, 0.3);
+    z-index: 100;
+}
+
+/* Lucide Logo SVG Fix */
+.logo { font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 10px; color: var(--text-main); }
+.logo svg { color: var(--pink-glow); filter: drop-shadow(0 0 10px var(--pink-glow)); width: 28px; height: 28px; }
+
+nav a { color: var(--text-muted); text-decoration: none; margin: 0 1.2rem; font-weight: 500; transition: var(--transition); }
+nav a:hover { color: var(--text-main); text-shadow: 0 0 10px var(--pink-glow); }
+
+/* --- Buttons --- */
+.btn { padding: 0.8rem 1.8rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: var(--transition); border: none; font-size: 0.95rem; }
+.btn-glow { background: transparent; color: var(--text-main); border: 1px solid var(--pink-main); border-radius: 100px; padding: 0.6rem 1.5rem; }
+.btn-glow:hover { background: rgba(255, 16, 122, 0.1); box-shadow: 0 0 20px var(--pink-glow); }
+.btn-solid-pink { background: var(--pink-main); color: white; box-shadow: 0 0 20px rgba(255, 16, 122, 0.4); }
+.btn-solid-pink:hover { background: white; color: var(--pink-main); box-shadow: 0 0 30px var(--pink-glow); transform: translateY(-2px); }
+.btn-outline-pink { background: transparent; color: var(--pink-main); border: 1px solid var(--pink-main); }
+.btn-outline-pink:hover { background: var(--pink-main); color: white; box-shadow: 0 0 25px rgba(255, 16, 122, 0.6); }
+
+/* --- Fluid Hero Section --- */
+.hero { margin-bottom: 6rem; padding: 2rem 0; }
+.hero h1 { font-size: clamp(3rem, 5vw + 1rem, 5.5rem); margin-bottom: 1.5rem; line-height: 1.1; letter-spacing: -1px; }
+.pink-text { color: var(--pink-main); text-shadow: 0 0 30px rgba(255, 16, 122, 0.5); }
+.hero p { color: var(--text-muted); font-size: clamp(1rem, 1.2vw + 0.5rem, 1.25rem); max-width: 700px; margin: 0 auto 2.5rem auto; line-height: 1.6; }
+.hero-btn { border-radius: 100px; padding: 1rem 2.5rem; font-size: 1.1rem; display: inline-flex; align-items: center; justify-content: center;}
+
+/* =========================================
+   4-COLUMN GRID & 3D CARDS
+   ========================================= */
+.tools-container { 
+    display: grid; 
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 2rem; 
+    perspective: 2000px; 
+    margin-bottom: 6rem; 
+}
+
+.flip-card { background-color: transparent; height: 420px; border-radius: 20px; cursor: pointer; transition: transform 0.4s ease; }
+.flip-card:hover { transform: translateY(-10px); }
+.flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: var(--flip-transition); transform-style: preserve-3d; }
+.flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
+.flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: flex; flex-direction: column; padding: 1.5rem; overflow: hidden; transform: translateZ(1px); }
+
+.card-glass { background: var(--card-bg); border-radius: 20px; box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5); border: 1px solid var(--glass-border); }
+.flip-card:hover .card-glass { border-color: rgba(255, 16, 122, 0.4); box-shadow: 0 15px 50px rgba(255, 16, 122, 0.15); }
+
+/* --- FRONT OF CARD --- */
+.card-image-wrapper { position: relative; width: 100%; height: 260px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+
+.status-badge { position: absolute; top: 1.5rem; right: 1.5rem; z-index: 10; padding: 0.3rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+.status-active { background: rgba(0, 230, 118, 0.15); color: var(--success-color); border: 1px solid rgba(0, 230, 118, 0.3); }
+.status-maintenance { background: rgba(255, 145, 0, 0.15); color: var(--warning-color); border: 1px solid rgba(255, 145, 0, 0.3); }
+
+.tool-img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.img-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(255,0,127,0.2), rgba(3,3,3,0.95)); }
+
+/* Lucide Front SVG Fix */
+.front-icon { 
+    position: absolute; top: 50%; left: 50%; 
+    transform: translate(-50%, -50%); 
+    width: 64px; height: 64px; 
+    color: white; filter: drop-shadow(0 0 15px var(--pink-glow)); 
+    z-index: 2; stroke-width: 1.5px; 
+}
+
+.front-title { font-size: 1.4rem; margin: auto 0; text-align: left; font-weight: 700; letter-spacing: -0.5px; }
+.flip-card:hover .tool-img { transform: scale(1.15); }
+
+/* --- BACK OF CARD --- */
+.flip-card-back { transform: rotateY(180deg) translateZ(1px); justify-content: center; padding: 2rem 1.5rem; text-align: left; }
+.card-glow-top { position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, transparent, var(--pink-glow), transparent); box-shadow: 0 0 20px var(--pink-glow); }
+.back-content { flex-grow: 1; }
+.back-content h3 { font-size: 1.5rem; margin-bottom: 0.8rem; color: var(--pink-main); text-shadow: 0 0 15px rgba(255, 16, 122, 0.4); letter-spacing: -0.5px; }
+.back-content p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem; }
+.price { display: block; font-size: 1.6rem; font-weight: 700; color: white; margin-bottom: 1.5rem; }
+
+/* FIX: Ensure Links are Clickable in 3D Space */
+.card-actions { 
+    display: flex; gap: 0.8rem; 
+    position: relative;
+    z-index: 10;
+    transform: translateZ(30px);
+}
+
+.action-btn { 
+    flex: 1; padding: 0.7rem 0; font-size: 0.9rem;
+    text-align: center; text-decoration: none; 
+    display: inline-flex; justify-content: center; align-items: center;
+}
+
+/* =========================================
+   FLOATING PILL FOOTER
+   ========================================= */
+.footer-pill {
+    max-width: 1000px; width: 90%; margin: 0 auto 4rem auto; padding: 1rem 2rem;
+    border-radius: 100px; display: flex; justify-content: space-between; align-items: center;
+    background: rgba(15, 15, 15, 0.6); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255, 16, 122, 0.3); z-index: 100; position: relative;
+}
+
+.footer-logo { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
+.footer-logo svg { color: var(--pink-glow); filter: drop-shadow(0 0 10px var(--pink-glow)); width: 24px; height: 24px;}
+
+.footer-copyright { color: var(--text-muted); font-size: 0.95rem; font-weight: 500; }
+
+.social-links { display: flex; gap: 0.8rem; }
+.social-icon { display: flex; justify-content: center; align-items: center; width: 38px; height: 38px; border-radius: 50%; background: transparent; color: var(--text-muted); font-size: 1.1rem; text-decoration: none; transition: var(--transition); }
+
+.social-icon:hover { transform: translateY(-3px); color: white; }
+.social-icon[aria-label="Discord"]:hover { text-shadow: 0 0 15px #5865F2; color: #5865F2; }
+.social-icon[aria-label="Telegram"]:hover { text-shadow: 0 0 15px #0088cc; color: #0088cc; }
+.social-icon[aria-label="Instagram"]:hover { text-shadow: 0 0 15px #e6683c; color: #e6683c; }
+.social-icon[aria-label="LinkedIn"]:hover { text-shadow: 0 0 15px #0077b5; color: #0077b5; }
+.social-icon[aria-label="YouTube"]:hover { text-shadow: 0 0 15px #FF0000; color: #FF0000; }
+
+/* --- JS Animations --- */
+.fade-up { opacity: 0; transform: translateY(40px); transition: opacity 1s cubic-bezier(0.2, 0.8, 0.2, 1), transform 1s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.fade-up.in-view { opacity: 1; transform: translateY(0); }
+.delay-1 { transition-delay: 0.1s; }
+.delay-2 { transition-delay: 0.2s; }
+.delay-3 { transition-delay: 0.3s; }
+.delay-4 { transition-delay: 0.4s; }
+
+/* --- Responsive Scaling --- */
+@media (max-width: 1200px) { .tools-container { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 992px) { .tools-container { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) {
+    .tools-container { grid-template-columns: 1fr; }
+    .desktop-nav { display: none; }
+    .nav-pill, .footer-pill { width: 100%; border-radius: 20px; margin-top: 1rem; flex-direction: column; gap: 1.5rem; text-align: center; padding: 1.5rem; }
+    .card-actions { flex-direction: column; }
+    .flip-card { height: 460px; } 
+}
