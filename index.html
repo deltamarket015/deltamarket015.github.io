@@ -14,23 +14,34 @@
     <div class="ambient-glow glow-pink-top"></div>
     <div class="ambient-glow glow-purple-bottom"></div>
 
-    <header class="glass nav-pill fade-up">
+    <header class="glass nav-pill fade-up" id="main-header">
         <div class="logo">
             <i data-lucide="code-2"></i> DeltaXTools
         </div>
+        
         <nav class="desktop-nav">
             <a href="#tools">Tools</a>
             <a href="#about">About</a>
             <a href="#contact">Service</a>
         </nav>
-        <a href="#" class="btn btn-glow" style="text-decoration: none;">Login</a>
+        
+        <button class="mobile-menu-btn" id="mobile-toggle" aria-label="Toggle Menu">
+            <i data-lucide="menu" class="menu-icon"></i>
+            <i data-lucide="x" class="close-icon" style="display: none;"></i>
+        </button>
     </header>
+
+    <div class="mobile-nav-menu" id="mobile-nav">
+        <a href="#tools" class="mobile-nav-link">Tools</a>
+        <a href="#about" class="mobile-nav-link">About</a>
+        <a href="#contact" class="mobile-nav-link">Service</a>
+    </div>
 
     <main class="container">
         <section class="hero text-center fade-up delay-1">
             <h1 class="glitch-text">Explore Our <span class="pink-text">Tools</span></h1>
             <p>Premium, highly-optimized tools and scripts. Use them live or purchase the source code to integrate into your own projects.</p>
-            <a href="#tools" class="btn btn-solid-pink hero-btn" style="text-decoration: none; display: inline-block;">
+            <a href="#tools" class="btn btn-solid-pink hero-btn" style="text-decoration: none; display: inline-flex;">
                 Explore Tools <i data-lucide="arrow-down" style="width: 18px; height: 18px; margin-left: 8px;"></i>
             </a>
         </section>
@@ -55,7 +66,7 @@
                                  stroke-linecap="round" 
                                  stroke-linejoin="round" 
                                  class="front-icon"
->
+                            >
                                  <path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8"/>
                                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
                                  <path d="M19 16v6"/>
@@ -71,8 +82,8 @@
                         <div class="card-glow-top"></div>
                         <div class="back-content">
                             <h3>TempMail <br>
-                                <span style="color:white">By.DeltaXTool</span></h3>
-                            <p>
+                                <span style="color:white; font-size: 1rem;">By.DeltaXTool</span></h3>
+                            <p style="text-align: left; padding-left: 10px;">
                                 ◇ Unlimited Mail Generation.<br>
                                 ◇ Shareabale TempMail Inbox.<br> 
                                 ◇ Receive unlimited mail.<br>
@@ -106,7 +117,7 @@
                                  stroke-linecap="round" 
                                  stroke-linejoin="round" 
                                  class="front-icon"
->
+                            >
                                  <path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/>
                                  <path d="m9 12 2 2 4-4"/>
                             </svg>
@@ -121,9 +132,9 @@
                         <div class="card-glow-top"></div>
                         <div class="back-content">
                             <h3>Chat Box <br>
-                                <span style="color:white">By.DeltaXTool</span>
+                                <span style="color:white; font-size: 1rem;">By.DeltaXTool</span>
                             </h3>
-                            <p>
+                            <p style="text-align: left; padding-left: 10px;">
                                 ◇ No Server Local Chat Box.<br>
                                 ◇ Private Message+Call.<br> 
                                 ◇ No Login Required.<br>
@@ -157,7 +168,7 @@
                                  stroke-linecap="round" 
                                  stroke-linejoin="round" 
                                  class="front-icon"
->
+                            >
                                  <path d="M4 12V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2"/>
                                  <path d="M14 2v5a1 1 0 0 0 1 1h5"/>
                                  <path d="m10 17.843 3.033-1.755a.64.64 0 0 1 .967.56v4.704a.65.65 0 0 1-.967.56L10 20.157"/>
@@ -173,16 +184,13 @@
                         <div class="card-glow-top"></div>
                         <div class="back-content">
                             <h3>Video Downloader<br>
-                                <span style="color:white">By.DeltaXTool</span>
+                                <span style="color:white; font-size: 1rem;">By.DeltaXTool</span>
                             </h3>
-                            <p>
+                            <p style="text-align: left; padding-left: 10px;">
                                 ◇ Download Instantly. <br>
                                 ◇ Video+Audio Download.<br>
                                 ◇ In All Quality Videos.<br>
-                                ◇ YouTube Videos.<br> 
-                                ◇ Facebook Videos.<br>
-                                ◇ Instagram Videos.<br>
-                                ◇ TikTok Video.
+                                ◇ Supports All Socials.
                             </p>
                             <span class="price">$2.00</span>
                         </div>
