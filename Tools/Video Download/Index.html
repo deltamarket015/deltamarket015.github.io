@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Social Downloader - Ultimate Video Downloader</title>
+    <meta name="description" content="Download videos from YouTube, Facebook, Instagram, TikTok and more for free.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+
+    <canvas id="particles-canvas"></canvas>
+
+    <div id="toast-container"></div>
+
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-box">
+            <div class="modal-title">Settings</div>
+            <div class="setting-row">
+                <span>Save History</span>
+                <label class="switch">
+                    <input type="checkbox" id="historyToggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div style="text-align: center; margin-top: 25px;">
+                <button class="btn-search" style="width: 100%;" onclick="document.getElementById('settingsModal').classList.remove('active')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        
+        <header class="app-header">
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                        <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                    </svg>
+                </div>
+                All<span class="neon-text">Down</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn-icon" id="settingsBtn" title="Settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                        <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <main>
+            <section class="hero">
+                <h1>Video Downloader<br> <span style="color:fuchsia;">Tool</span></h1>
+                <p>Paste a link from YouTube, Facebook, Instagram, or TikTok to download instantly in high quality.</p>
+            </section>
+
+            <div class="search-wrapper">
+                <div class="search-box">
+                    <div class="search-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                        </svg>
+                    </div>
+                    <input type="text" class="search-input" id="urlInput" placeholder="Paste video URL here..." autocomplete="off">
+                    <div class="search-actions">
+                        <button class="action-btn" id="pasteBtn" title="Paste">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                                <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+                            </svg>
+                        </button>
+                        <button class="action-btn" id="clearBtn" title="Clear">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <button class="btn-search" id="searchBtn">
+                        <span>Download</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="skeleton-loader" id="loader">
+                <div class="skel-card"></div>
+                <div class="skel-text-group">
+                    <div class="skel-line w-80"></div>
+                    <div class="skel-line w-60"></div>
+                </div>
+            </div>
+
+            <div id="result-area">
+                <div class="video-card">
+                    <div style="position: relative;">
+                        <img src="" alt="Thumbnail" class="video-thumb" id="resThumb">
+                        <span class="video-duration" id="resDuration">00:00</span>
+                    </div>
+                    <div class="card-body">
+                        <h2 class="video-title" id="resTitle">Loading title...</h2>
+                        <div class="video-meta">
+                            <span id="resSource">Source</span>
+                            <span class="neon-text" style="font-weight:600;">HD Available</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tabs-nav">
+                    <button class="tab-btn active" onclick="app.switchTab('video')">Video (MP4)</button>
+                    <button class="tab-btn" onclick="app.switchTab('audio')">Audio (MP3)</button>
+                </div>
+
+                <div id="tab-video" class="format-list"></div>
+                
+                <div id="tab-audio" class="format-list" style="display:none;"></div>
+            </div>
+
+            <section class="history-section" id="historySection">
+                <div class="section-head">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022l-.074.997zm2.004.45a7.003 7.003 0 0 0-.985-.299l.219-.976c.383.086.756.205 1.115.354l-.35.921zM12.3 2.595c.34.258.653.548.934.865l-.746.666a6.008 6.008 0 0 0-.796-.73l.608-.801zm2.146 2.146c.258.34.548.653.865.934l-.666.746a6.008 6.008 0 0 0-.73-.796l.801-.608zM15 8c0 .34-.022.673-.064 1.002l-.997-.074A6.01 6.01 0 0 0 14 8h1zM8 15a7 7 0 1 1 0-14 7 7 0 0 1 0 14zm0-1A6 6 0 1 0 8 2a6 6 0 0 0 0 12z"/>
+                            <path d="M8 3.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.146.354l-3 3a.5.5 0 0 1-.708-.708L7.5 7.793V4a.5.5 0 0 1 .5-.5z"/>
+                        </svg>
+                        Recent
+                    </h3>
+                    <button class="clear-btn" id="clearHistory">Clear All</button>
+                </div>
+                <div class="history-list" id="historyList">
+                    </div>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <p>&copy; 2026 <strong>AllDown</strong>. Designed & Developed by <a href="https://t.me/Delta_Market_Store" target="_blank" class="author neon-link">Delta Merket</a>.</p>
+        </footer>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
