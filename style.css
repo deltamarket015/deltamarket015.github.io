@@ -72,14 +72,17 @@ body {
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     border: 1px solid rgba(255, 16, 122, 0.3);
     z-index: 100;
+    position: relative; /* Essential for mobile z-index layering */
 }
 
-/* Lucide Logo SVG Fix */
 .logo { font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 10px; color: var(--text-main); }
 .logo svg { color: var(--pink-glow); filter: drop-shadow(0 0 10px var(--pink-glow)); width: 28px; height: 28px; }
 
 nav a { color: var(--text-muted); text-decoration: none; margin: 0 1.2rem; font-weight: 500; transition: var(--transition); }
 nav a:hover { color: var(--text-main); text-shadow: 0 0 10px var(--pink-glow); }
+
+/* Hide Mobile Elements on Desktop by Default */
+.mobile-menu-btn, .mobile-nav-menu { display: none; }
 
 /* --- Buttons --- */
 .btn { padding: 0.8rem 1.8rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: var(--transition); border: none; font-size: 0.95rem; }
@@ -98,7 +101,7 @@ nav a:hover { color: var(--text-main); text-shadow: 0 0 10px var(--pink-glow); }
 .hero-btn { border-radius: 100px; padding: 1rem 2.5rem; font-size: 1.1rem; display: inline-flex; align-items: center; justify-content: center;}
 
 /* =========================================
-   4-COLUMN GRID & 3D CARDS
+   GRID & 3D CARDS
    ========================================= */
 .tools-container { 
     display: grid; 
@@ -127,7 +130,6 @@ nav a:hover { color: var(--text-main); text-shadow: 0 0 10px var(--pink-glow); }
 .tool-img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
 .img-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(255,0,127,0.2), rgba(3,3,3,0.95)); }
 
-/* Lucide Front SVG Fix */
 .front-icon { 
     position: absolute; top: 50%; left: 50%; 
     transform: translate(-50%, -50%); 
@@ -140,14 +142,13 @@ nav a:hover { color: var(--text-main); text-shadow: 0 0 10px var(--pink-glow); }
 .flip-card:hover .tool-img { transform: scale(1.15); }
 
 /* --- BACK OF CARD --- */
-.flip-card-back { transform: rotateY(180deg) translateZ(1px); justify-content: center; padding: 2rem 1.5rem; text-align: left; }
+.flip-card-back { transform: rotateY(180deg) translateZ(1px); justify-content: center; padding: 1.5rem; text-align: left; }
 .card-glow-top { position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, transparent, var(--pink-glow), transparent); box-shadow: 0 0 20px var(--pink-glow); }
 .back-content { flex-grow: 1; }
 .back-content h3 { font-size: 1.5rem; margin-bottom: 0.8rem; color: var(--pink-main); text-shadow: 0 0 15px rgba(255, 16, 122, 0.4); letter-spacing: -0.5px; }
-.back-content p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem; }
+.back-content p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 1rem; }
 .price { display: block; font-size: 1.6rem; font-weight: 700; color: white; margin-bottom: 1.5rem; }
 
-/* FIX: Ensure Links are Clickable in 3D Space */
 .card-actions { 
     display: flex; gap: 0.8rem; 
     position: relative;
@@ -194,13 +195,109 @@ nav a:hover { color: var(--text-main); text-shadow: 0 0 10px var(--pink-glow); }
 .delay-3 { transition-delay: 0.3s; }
 .delay-4 { transition-delay: 0.4s; }
 
-/* --- Responsive Scaling --- */
+/* =========================================
+   PERFECT MOBILE RESPONSIVENESS
+   ========================================= */
 @media (max-width: 1200px) { .tools-container { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 992px) { .tools-container { grid-template-columns: repeat(2, 1fr); } }
+
 @media (max-width: 768px) {
-    .tools-container { grid-template-columns: 1fr; }
+    /* 1. Global Spacing */
+    .container { padding: 0 1.2rem; }
+
+    /* 2. Header & Dropdown Menu Fix */
     .desktop-nav { display: none; }
-    .nav-pill, .footer-pill { width: 100%; border-radius: 20px; margin-top: 1rem; flex-direction: column; gap: 1.5rem; text-align: center; padding: 1.5rem; }
-    .card-actions { flex-direction: column; }
-    .flip-card { height: 460px; } 
+    
+    .nav-pill { 
+        flex-direction: row; 
+        width: 90%; 
+        border-radius: 100px; 
+        margin: 1.5rem auto 2rem auto; 
+        padding: 0.8rem 1.5rem; 
+    }
+    .logo { font-size: 1.2rem; }
+    
+    /* Toggle Button Styles */
+    .mobile-menu-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        color: var(--text-main);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    .mobile-menu-btn:hover { color: var(--pink-main); }
+    .mobile-menu-btn svg { width: 26px; height: 26px; }
+
+    /* The Dropdown Menu Styles */
+    .mobile-nav-menu {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 90px; /* Slides down from right below the header */
+        left: 5%;
+        width: 90%;
+        background: rgba(15, 15, 15, 0.85);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 16, 122, 0.3);
+        border-radius: 20px;
+        padding: 2rem;
+        gap: 1.5rem;
+        text-align: center;
+        z-index: 99; /* Just under the header (100) */
+        box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+        
+        /* Premium Animation Setup */
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-20px) scale(0.95);
+        transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .mobile-nav-menu.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0) scale(1);
+    }
+
+    .mobile-nav-link {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-main);
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    .mobile-nav-link:hover {
+        color: var(--pink-main);
+        text-shadow: 0 0 10px var(--pink-glow);
+    }
+
+    /* 3. Hero Section Fix */
+    .hero { margin-bottom: 4rem; }
+    .hero h1 { font-size: 2.8rem; }
+    .hero p { font-size: 1rem; padding: 0; }
+    .hero-btn { width: 100%; max-width: 320px; }
+
+    /* 4. Grid and Cards Fix */
+    .tools-container { grid-template-columns: 1fr; gap: 2rem; }
+    .flip-card { height: 480px; }
+    
+    .card-actions { flex-direction: column; gap: 0.8rem; }
+    .action-btn { padding: 0.9rem 0; font-size: 1rem; }
+
+    /* 5. Footer Fix */
+    .footer-pill { 
+        width: 100%; 
+        border-radius: 24px;
+        margin: 0 auto 2rem auto; 
+        flex-direction: column; 
+        gap: 1.5rem; 
+        text-align: center; 
+        padding: 2rem 1.5rem; 
+    }
+    .social-links { justify-content: center; }
 }
